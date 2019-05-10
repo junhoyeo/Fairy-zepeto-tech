@@ -1,19 +1,19 @@
-import sys
-import json
 import cv2
 from imutils.video import VideoStream
 import imutils
 import dlib
+
 
 def draw_dlib_rect(frame, rect):
     x, y = rect.left(), rect.top()
     w, h = rect.right() - x, rect.bottom() - y
     cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
+
 def main():
     detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor(
-        './shape_predictor_68_face_landmarks.dat')
+    # predictor = dlib.shape_predictor(
+    #     './shape_predictor_68_face_landmarks.dat')
 
     vs = VideoStream(src=0, resolution=(1280, 960)).start()
     fileStream = False
@@ -63,8 +63,9 @@ def main():
             # shape = get_shape(predictor, gray, rect)
 
             draw_dlib_rect(frame, rect)
-            frame_x, frame_y = int((rect.right() + rect.left()) / 2), int(rect.top() + rect.bottom() / 2)
-            cv2.circle(frame, (frame_x, frame_y), 5, (0,255,0), -1)
+            frame_x, frame_y = int(
+                (rect.right() + rect.left()) / 2), int(rect.top() + rect.bottom() / 2)
+            cv2.circle(frame, (frame_x, frame_y), 5, (0, 255, 0), -1)
             dx = (frame_x - mask_x)
             dy = (frame_y - mask_y)
 

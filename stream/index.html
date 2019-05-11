@@ -1,17 +1,21 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
 <body>
   <div id="container">
-    <canvas />
+    <canvas id="cam" width="1280" height="720"></canvas>
+    <canvas id="res" width="1280" height="720"></canvas>
     <video autoplay="true" id="video"></video>
   </div>
   <style>
     #video {
       visibility: hidden;
     }
+    canvas {
+      width: 40%;
+    }
   </style>
   <script>
     var socket = io.connect('http://localhost:8001');
-    var canvas = document.querySelector('canvas');
+    var canvas = document.querySelector('canvas#cam');
     var video = document.querySelector("#video");
 
     setInterval(function(){
@@ -24,8 +28,6 @@
             imageCapture.grabFrame()
               .then(function(imageBitmap) {
                 // console.log('Grabbed frame:', imageBitmap);
-                canvas.width = imageBitmap.width;
-                canvas.height = imageBitmap.height;
                 canvas.getContext('2d').drawImage(imageBitmap, 0, 0);
               })
           })
@@ -33,14 +35,19 @@
             console.log(error);
           });
       }
-      // console.log(canvas.toDataURL());
-      console.log(socket.emit('frame', {
-        url: canvas.toDataURL
-      }));
+      var url = canvas.toDataURL();
+      // console.log(url);
+      socket.emit('frame', url);
     }, 100);
 
-    socket.on('processed', function (data) {
-      console.log(data)
+    var processed = document.querySelector('canvas#res');
+    socket.on('processed', function (imageURI) { // processed frame
+      var ctx = processed.getContext('2d');
+      var img = new Image;
+      img.onload = function(){
+        ctx.drawImage(img, 0, 0);
+      };
+      img.src = imageURI;
     })
   </script>
 </body>

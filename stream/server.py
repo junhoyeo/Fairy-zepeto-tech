@@ -9,6 +9,7 @@ socketio = SocketIO(app)
 @socketio.on('frame')
 def received_frame(url):
     print(datetime.now(), 'Frame Received!')
+    socketio.emit('processed', 'wow')
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, port=8001)

@@ -34,9 +34,13 @@
           });
       }
       // console.log(canvas.toDataURL());
-      socket.emit('frame', {
+      console.log(socket.emit('frame', {
         url: canvas.toDataURL
-      });
+      }));
     }, 100);
+
+    socket.on('processed', function (data) {
+      console.log(data)
+    })
   </script>
 </body>

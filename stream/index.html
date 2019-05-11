@@ -1,0 +1,36 @@
+<body>
+  <div id="container">
+    <canvas />
+    <video autoplay="true" id="video"></video>
+  </div>
+  <style>
+    #video {
+      visibility: hidden;
+    }
+  </style>
+  <script>
+    var canvas = document.querySelector('canvas');
+    var video = document.querySelector("#video");
+
+    setInterval(function(){
+    if (navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function (stream) {
+          video.srcObject = stream;
+          const track = stream.getVideoTracks()[0];
+          let imageCapture = new ImageCapture(track);
+          imageCapture.grabFrame()
+            .then(function(imageBitmap) {
+              console.log('Grabbed frame:', imageBitmap);
+              canvas.width = imageBitmap.width;
+              canvas.height = imageBitmap.height;
+              canvas.getContext('2d').drawImage(imageBitmap, 0, 0);
+            })
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
+    }, 100);
+  </script>
+</body>

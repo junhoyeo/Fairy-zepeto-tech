@@ -2,6 +2,20 @@ import cv2
 import imutils
 import dlib
 
+def _draw_rect(frame, rect):
+    (x, y, w, h) = rect
+    cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+    return rect
+
+
+def draw_dlib_rect(frame, rect):
+    # dlib.rectangle을 frame에 cv2 rectangle로 표시
+    x, y = rect.left(), rect.top()
+    return _draw_rect(frame, (x, y, rect.right() - x, rect.bottom() - y))
+
+def get_rect_width(rect):
+    return rect.right() - rect.left()
+
 def main():
     detector = dlib.get_frontal_face_detector()
     # predictor = dlib.shape_predictor(
@@ -15,8 +29,6 @@ def main():
     PREV_MAX = 100
 
     mask = cv2.imread('./mask.png', -1)
-    mask_h, mask_w, _ = mask.shape
-    mask_x, mask_y = mask_w / 2, mask_h / 2
 
     frame = cv2.imread('./photo.jpg', -1)
     frame = imutils.resize(frame, width=960)
@@ -47,7 +59,10 @@ def main():
 
         # shape = get_shape(predictor, gray, rect)
 
-        # draw_dlib_rect(frame, rect)
+        mask = cv2.resize(mask, (get_rect_width(rect), get_rect_width(rect)))
+        mask_h, mask_w, _ = mask.shape
+        mask_x, mask_y = mask_w / 2, mask_h / 2
+
         locate_x, locate_y = int(
             (rect.right() + rect.left()) / 2), int(rect.top() + rect.bottom() / 2) - 100
         dx = (locate_x - mask_x)
@@ -59,6 +74,8 @@ def main():
         for c in range(0, 3):
             frame[int(dy):int(dy + mask_h), int(dx):int(dx + mask_w), c] = (alpha_s * mask[:, :, c] +
                                       alpha_l * frame[int(dy):int(dy + mask_h), int(dx):int(dx + mask_w), c])
+
+        draw_dlib_rect(frame, rect)
 
     cv2.imshow("Frame", frame)  # 프레임 표시
     cv2.waitKey(0)

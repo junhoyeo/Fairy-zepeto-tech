@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Flask, render_template
 from flask_socketio import SocketIO
 
@@ -7,7 +8,7 @@ socketio = SocketIO(app)
 
 @socketio.on('frame')
 def received_frame(url):
-    print(url)
+    print(datetime.now(), 'Frame Received!')
 
 if __name__ == '__main__':
-    socketio.run(app)
+    socketio.run(app, debug=True, port=8001)
